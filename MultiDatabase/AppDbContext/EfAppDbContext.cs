@@ -1,16 +1,10 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
+using MultiDatabase.Models.Postgres;
+using MultiDatabase.Models.SqlServer;
 
 namespace MultiDatabase.AppDbContext
 {
-    public class EfAppDbContext : DbContext
-    {
-        public EfAppDbContext(DbContextOptions<EfAppDbContext> options) : base(options)
-        {
-        }
-    }
-
     public enum DatabaseType
     {
         SqlServer,
@@ -19,7 +13,8 @@ namespace MultiDatabase.AppDbContext
 
     public interface IDatabaseContextFactory
     {
-        EfAppDbContext CreateDbContext(string databaseName, DatabaseType databaseType = DatabaseType.SqlServer);
+        DbContext CreateDbContext(string databaseName, DatabaseType databaseType = DatabaseType.SqlServer);
+        Task<bool> TestConnectionAsync(string databaseName, DatabaseType databaseType = DatabaseType.SqlServer);
     }
 
     public class DatabaseContextFactory : IDatabaseContextFactory
@@ -33,27 +28,41 @@ namespace MultiDatabase.AppDbContext
             _postgresConnectionString = configuration.GetConnectionString("PostgresConnection")!;
         }
 
-        public EfAppDbContext CreateDbContext(string databaseName, DatabaseType databaseType = DatabaseType.SqlServer)
+        public DbContext CreateDbContext(string databaseName, DatabaseType databaseType = DatabaseType.SqlServer)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<EfAppDbContext>();
-
             switch (databaseType)
             {
                 case DatabaseType.SqlServer:
                     var sqlServerConn = GetSqlServerConnectionString(_sqlServerConnectionString, databaseName);
-                    optionsBuilder.UseSqlServer(sqlServerConn);
-                    break;
+                    var sqlServerOptions = new DbContextOptionsBuilder<SqlServerDbContext>()
+                        .UseSqlServer(sqlServerConn)
+                        .Options;
+                    return new SqlServerDbContext(sqlServerOptions);
 
                 case DatabaseType.PostgreSQL:
                     var postgresConn = GetPostgresConnectionString(_postgresConnectionString, databaseName);
-                    optionsBuilder.UseNpgsql(postgresConn);
-                    break;
+                    var postgresOptions = new DbContextOptionsBuilder<PostgresDbContext>()
+                        .UseNpgsql(postgresConn)
+                        .Options;
+                    return new PostgresDbContext(postgresOptions);
 
                 default:
                     throw new ArgumentException($"Unsupported database type: {databaseType}");
             }
+        }
 
-            return new EfAppDbContext(optionsBuilder.Options);
+        public async Task<bool> TestConnectionAsync(string databaseName, DatabaseType databaseType = DatabaseType.SqlServer)
+        {
+            try
+            {
+                using var context = CreateDbContext(databaseName, databaseType);
+                await context.Database.CanConnectAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private static string GetSqlServerConnectionString(string connectionString, string databaseName)
@@ -73,7 +82,7 @@ namespace MultiDatabase.AppDbContext
             if (string.IsNullOrEmpty(databaseName))
                 return connectionString;
 
-            var builder = new NpgsqlConnectionStringBuilder(connectionString)
+            var builder = new Npgsql.NpgsqlConnectionStringBuilder(connectionString)
             {
                 Database = databaseName
             };

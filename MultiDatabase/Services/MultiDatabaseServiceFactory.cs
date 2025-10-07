@@ -1,5 +1,5 @@
 ﻿using MultiDatabase.AppDbContext;
-using MultiDatabase.Repositories.Blog.BlogRepository;
+using MultiDatabase.Repositories;
 using MultiDatabase.Repositories.Blog.BlogService;
 
 namespace MultiDatabase.Services;

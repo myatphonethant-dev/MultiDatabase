@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MultiDatabase.AppDbContext;
 using MultiDatabase.Models.Common;
+using MultiDatabase.Repositories.Blog.BlogRepository;
 
-namespace MultiDatabase.Repositories.Blog.BlogRepository;
+namespace MultiDatabase.Repositories;
 
 public class BlogRepository : IBlogRepository
 {
@@ -19,13 +20,13 @@ public class BlogRepository : IBlogRepository
     {
         if (_databaseType == DatabaseType.SqlServer)
         {
-            var sqlBlog = await _context.Set<SqlServer.TblBlog>().FindAsync(id);
-            return sqlBlog == null ? null : MapToCommon(sqlBlog);
+            var sqlBlog = await _context.Set<Models.SqlServer.TblBlog>().FindAsync(id);
+            return sqlBlog == null ? null! : MapToCommon(sqlBlog);
         }
         else
         {
-            var postgresBlog = await _context.Set<Postgres.TblBlog>().FindAsync(id);
-            return postgresBlog == null ? null : MapToCommon(postgresBlog);
+            var postgresBlog = await _context.Set<Models.Postgres.TblBlog>().FindAsync(id);
+            return postgresBlog == null ? null! : MapToCommon(postgresBlog);
         }
     }
 
@@ -33,12 +34,12 @@ public class BlogRepository : IBlogRepository
     {
         if (_databaseType == DatabaseType.SqlServer)
         {
-            var sqlBlogs = await _context.Set<SqlServer.TblBlog>().ToListAsync();
+            var sqlBlogs = await _context.Set<Models.SqlServer.TblBlog>().ToListAsync();
             return sqlBlogs.Select(MapToCommon);
         }
         else
         {
-            var postgresBlogs = await _context.Set<Postgres.TblBlog>().ToListAsync();
+            var postgresBlogs = await _context.Set<Models.Postgres.TblBlog>().ToListAsync();
             return postgresBlogs.Select(MapToCommon);
         }
     }
@@ -47,14 +48,14 @@ public class BlogRepository : IBlogRepository
     {
         if (_databaseType == DatabaseType.SqlServer)
         {
-            var sqlBlogs = await _context.Set<SqlServer.TblBlog>()
+            var sqlBlogs = await _context.Set<Models.SqlServer.TblBlog>()
                 .Where(b => b.BlogAuthor != null && b.BlogAuthor.Contains(author))
                 .ToListAsync();
             return sqlBlogs.Select(MapToCommon);
         }
         else
         {
-            var postgresBlogs = await _context.Set<Postgres.TblBlog>()
+            var postgresBlogs = await _context.Set<Models.Postgres.TblBlog>()
                 .Where(b => b.BlogAuthor != null && b.BlogAuthor.Contains(author))
                 .ToListAsync();
             return postgresBlogs.Select(MapToCommon);
@@ -65,14 +66,14 @@ public class BlogRepository : IBlogRepository
     {
         if (_databaseType == DatabaseType.SqlServer)
         {
-            var sqlBlogs = await _context.Set<SqlServer.TblBlog>()
+            var sqlBlogs = await _context.Set<Models.SqlServer.TblBlog>()
                 .Where(b => b.BlogTitle != null && b.BlogTitle.Contains(searchTerm))
                 .ToListAsync();
             return sqlBlogs.Select(MapToCommon);
         }
         else
         {
-            var postgresBlogs = await _context.Set<Postgres.TblBlog>()
+            var postgresBlogs = await _context.Set<Models.Postgres.TblBlog>()
                 .Where(b => b.BlogTitle != null && b.BlogTitle.Contains(searchTerm))
                 .ToListAsync();
             return postgresBlogs.Select(MapToCommon);
@@ -84,7 +85,7 @@ public class BlogRepository : IBlogRepository
         if (_databaseType == DatabaseType.SqlServer)
         {
             var sqlBlog = MapToSqlServer(blog);
-            await _context.Set<SqlServer.TblBlog>().AddAsync(sqlBlog);
+            await _context.Set<Models.SqlServer.TblBlog>().AddAsync(sqlBlog);
             await _context.SaveChangesAsync();
             blog.BlogId = sqlBlog.BlogId;
             return blog;
@@ -92,7 +93,7 @@ public class BlogRepository : IBlogRepository
         else
         {
             var postgresBlog = MapToPostgres(blog);
-            await _context.Set<Postgres.TblBlog>().AddAsync(postgresBlog);
+            await _context.Set<Models.Postgres.TblBlog>().AddAsync(postgresBlog);
             await _context.SaveChangesAsync();
             blog.BlogId = postgresBlog.BlogId;
             return blog;
@@ -104,13 +105,13 @@ public class BlogRepository : IBlogRepository
         if (_databaseType == DatabaseType.SqlServer)
         {
             var sqlBlog = MapToSqlServer(blog);
-            _context.Set<SqlServer.TblBlog>().Update(sqlBlog);
+            _context.Set<Models.SqlServer.TblBlog>().Update(sqlBlog);
             await _context.SaveChangesAsync();
         }
         else
         {
             var postgresBlog = MapToPostgres(blog);
-            _context.Set<Postgres.TblBlog>().Update(postgresBlog);
+            _context.Set<Models.Postgres.TblBlog>().Update(postgresBlog);
             await _context.SaveChangesAsync();
         }
     }
@@ -119,19 +120,19 @@ public class BlogRepository : IBlogRepository
     {
         if (_databaseType == DatabaseType.SqlServer)
         {
-            var sqlBlog = await _context.Set<SqlServer.TblBlog>().FindAsync(id);
+            var sqlBlog = await _context.Set<Models.SqlServer.TblBlog>().FindAsync(id);
             if (sqlBlog != null)
             {
-                _context.Set<SqlServer.TblBlog>().Remove(sqlBlog);
+                _context.Set<Models.SqlServer.TblBlog>().Remove(sqlBlog);
                 await _context.SaveChangesAsync();
             }
         }
         else
         {
-            var postgresBlog = await _context.Set<Postgres.TblBlog>().FindAsync(id);
+            var postgresBlog = await _context.Set<Models.Postgres.TblBlog>().FindAsync(id);
             if (postgresBlog != null)
             {
-                _context.Set<Postgres.TblBlog>().Remove(postgresBlog);
+                _context.Set<Models.Postgres.TblBlog>().Remove(postgresBlog);
                 await _context.SaveChangesAsync();
             }
         }
@@ -141,11 +142,11 @@ public class BlogRepository : IBlogRepository
     {
         if (_databaseType == DatabaseType.SqlServer)
         {
-            return await _context.Set<SqlServer.TblBlog>().AnyAsync(b => b.BlogId == id);
+            return await _context.Set<Models.SqlServer.TblBlog>().AnyAsync(b => b.BlogId == id);
         }
         else
         {
-            return await _context.Set<Postgres.TblBlog>().AnyAsync(b => b.BlogId == id);
+            return await _context.Set<Models.Postgres.TblBlog>().AnyAsync(b => b.BlogId == id);
         }
     }
 
@@ -153,16 +154,16 @@ public class BlogRepository : IBlogRepository
     {
         if (_databaseType == DatabaseType.SqlServer)
         {
-            return await _context.Set<SqlServer.TblBlog>().CountAsync();
+            return await _context.Set<Models.SqlServer.TblBlog>().CountAsync();
         }
         else
         {
-            return await _context.Set<Postgres.TblBlog>().CountAsync();
+            return await _context.Set<Models.Postgres.TblBlog>().CountAsync();
         }
     }
 
     // Mapping methods
-    private BlogModel MapToCommon(SqlServer.TblBlog sqlBlog)
+    private BlogModel MapToCommon(Models.SqlServer.TblBlog sqlBlog)
     {
         return new BlogModel
         {
@@ -173,7 +174,7 @@ public class BlogRepository : IBlogRepository
         };
     }
 
-    private Blog MapToCommon(Postgres.TblBlog postgresBlog)
+    private BlogModel MapToCommon(Models.Postgres.TblBlog postgresBlog)
     {
         return new BlogModel
         {
@@ -184,9 +185,9 @@ public class BlogRepository : IBlogRepository
         };
     }
 
-    private SqlServer.TblBlog MapToSqlServer(BlogModel blog)
+    private Models.SqlServer.TblBlog MapToSqlServer(BlogModel blog)
     {
-        return new SqlServer.TblBlog
+        return new Models.SqlServer.TblBlog
         {
             BlogId = blog.BlogId,
             BlogTitle = blog.BlogTitle,
@@ -195,9 +196,9 @@ public class BlogRepository : IBlogRepository
         };
     }
 
-    private Postgres.TblBlog MapToPostgres(BlogModel blog)
+    private Models.Postgres.TblBlog MapToPostgres(BlogModel blog)
     {
-        return new Postgres.TblBlog
+        return new Models.Postgres.TblBlog
         {
             BlogId = blog.BlogId,
             BlogTitle = blog.BlogTitle,
