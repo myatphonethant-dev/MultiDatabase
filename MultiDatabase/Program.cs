@@ -1,14 +1,10 @@
-using Microsoft.EntityFrameworkCore;
 using MultiDatabase.AppDbContext;
+using MultiDatabase.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddScoped<IDatabaseContextFactory, DatabaseContextFactory>();
-
-// Register DbContext for default database (optional)
-builder.Services.AddDbContext<EfAppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnection")));
+builder.Services.AddScoped<IMultiDatabaseServiceFactory, MultiDatabaseServiceFactory>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

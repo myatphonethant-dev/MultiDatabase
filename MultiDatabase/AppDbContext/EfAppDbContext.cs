@@ -20,7 +20,6 @@ namespace MultiDatabase.AppDbContext
     public interface IDatabaseContextFactory
     {
         EfAppDbContext CreateDbContext(string databaseName, DatabaseType databaseType = DatabaseType.SqlServer);
-        Task<bool> TestConnectionAsync(string databaseName, DatabaseType databaseType = DatabaseType.SqlServer);
     }
 
     public class DatabaseContextFactory : IDatabaseContextFactory
@@ -55,20 +54,6 @@ namespace MultiDatabase.AppDbContext
             }
 
             return new EfAppDbContext(optionsBuilder.Options);
-        }
-
-        public async Task<bool> TestConnectionAsync(string databaseName, DatabaseType databaseType = DatabaseType.SqlServer)
-        {
-            try
-            {
-                using var context = CreateDbContext(databaseName, databaseType);
-                await context.Database.CanConnectAsync();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
         }
 
         private static string GetSqlServerConnectionString(string connectionString, string databaseName)
