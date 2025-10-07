@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace MultiDatabase.Models.SqlServer;
+﻿namespace MultiDatabase.Models.SqlServer;
 
 public partial class TblBlog
 {

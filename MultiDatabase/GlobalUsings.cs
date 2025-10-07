@@ -1,0 +1,12 @@
+﻿global using System.Text.Json.Serialization;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.Data.SqlClient;
+global using Microsoft.EntityFrameworkCore;
+global using MultiDatabase.AppDbContext;
+global using MultiDatabase.Models.Common;
+global using MultiDatabase.Models.Postgres;
+global using MultiDatabase.Models.SqlServer;
+global using MultiDatabase.Services;
+global using MultiDatabase.Repositories;
+global using MultiDatabase.Repositories.Blog.BlogRepository;
+global using MultiDatabase.Repositories.Blog.BlogService;

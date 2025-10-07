@@ -1,8 +1,4 @@
-﻿using MultiDatabase.AppDbContext;
-using MultiDatabase.Repositories;
-using MultiDatabase.Repositories.Blog.BlogService;
-
-namespace MultiDatabase.Services;
+﻿namespace MultiDatabase.Services;
 
 public interface IMultiDatabaseServiceFactory
 {
@@ -20,7 +16,7 @@ public class MultiDatabaseServiceFactory : IMultiDatabaseServiceFactory
 
     public IBlogService CreateBlogService(DatabaseType databaseType)
     {
-        var context = _contextFactory.CreateDbContext("TestDb", databaseType);
+        var context = _contextFactory.CreateDbContext("testdb", databaseType);
         var blogRepository = new BlogRepository(context, databaseType);
         return new BlogService(blogRepository);
     }

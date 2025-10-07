@@ -1,9 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using MultiDatabase.AppDbContext;
-using MultiDatabase.Models.Common;
-using MultiDatabase.Repositories.Blog.BlogRepository;
-
-namespace MultiDatabase.Repositories;
+﻿namespace MultiDatabase.Repositories;
 
 public class BlogRepository : IBlogRepository
 {
@@ -18,7 +13,7 @@ public class BlogRepository : IBlogRepository
 
     public async Task<BlogModel> GetByIdAsync(int id)
     {
-        if (_databaseType == DatabaseType.SqlServer)
+        if (_databaseType == DatabaseType.Mssql)
         {
             var sqlBlog = await _context.Set<Models.SqlServer.TblBlog>().FindAsync(id);
             return sqlBlog == null ? null! : MapToCommon(sqlBlog);
@@ -32,7 +27,7 @@ public class BlogRepository : IBlogRepository
 
     public async Task<IEnumerable<BlogModel>> GetAllAsync()
     {
-        if (_databaseType == DatabaseType.SqlServer)
+        if (_databaseType == DatabaseType.Mssql)
         {
             var sqlBlogs = await _context.Set<Models.SqlServer.TblBlog>().ToListAsync();
             return sqlBlogs.Select(MapToCommon);
@@ -46,7 +41,7 @@ public class BlogRepository : IBlogRepository
 
     public async Task<IEnumerable<BlogModel>> GetByAuthorAsync(string author)
     {
-        if (_databaseType == DatabaseType.SqlServer)
+        if (_databaseType == DatabaseType.Mssql)
         {
             var sqlBlogs = await _context.Set<Models.SqlServer.TblBlog>()
                 .Where(b => b.BlogAuthor != null && b.BlogAuthor.Contains(author))
@@ -64,7 +59,7 @@ public class BlogRepository : IBlogRepository
 
     public async Task<IEnumerable<BlogModel>> SearchByTitleAsync(string searchTerm)
     {
-        if (_databaseType == DatabaseType.SqlServer)
+        if (_databaseType == DatabaseType.Mssql)
         {
             var sqlBlogs = await _context.Set<Models.SqlServer.TblBlog>()
                 .Where(b => b.BlogTitle != null && b.BlogTitle.Contains(searchTerm))
@@ -82,7 +77,7 @@ public class BlogRepository : IBlogRepository
 
     public async Task<BlogModel> AddAsync(BlogModel blog)
     {
-        if (_databaseType == DatabaseType.SqlServer)
+        if (_databaseType == DatabaseType.Mssql)
         {
             var sqlBlog = MapToSqlServer(blog);
             await _context.Set<Models.SqlServer.TblBlog>().AddAsync(sqlBlog);
@@ -102,7 +97,7 @@ public class BlogRepository : IBlogRepository
 
     public async Task UpdateAsync(BlogModel blog)
     {
-        if (_databaseType == DatabaseType.SqlServer)
+        if (_databaseType == DatabaseType.Mssql)
         {
             var sqlBlog = MapToSqlServer(blog);
             _context.Set<Models.SqlServer.TblBlog>().Update(sqlBlog);
@@ -118,7 +113,7 @@ public class BlogRepository : IBlogRepository
 
     public async Task DeleteAsync(int id)
     {
-        if (_databaseType == DatabaseType.SqlServer)
+        if (_databaseType == DatabaseType.Mssql)
         {
             var sqlBlog = await _context.Set<Models.SqlServer.TblBlog>().FindAsync(id);
             if (sqlBlog != null)
@@ -140,7 +135,7 @@ public class BlogRepository : IBlogRepository
 
     public async Task<bool> ExistsAsync(int id)
     {
-        if (_databaseType == DatabaseType.SqlServer)
+        if (_databaseType == DatabaseType.Mssql)
         {
             return await _context.Set<Models.SqlServer.TblBlog>().AnyAsync(b => b.BlogId == id);
         }
@@ -152,7 +147,7 @@ public class BlogRepository : IBlogRepository
 
     public async Task<int> CountAsync()
     {
-        if (_databaseType == DatabaseType.SqlServer)
+        if (_databaseType == DatabaseType.Mssql)
         {
             return await _context.Set<Models.SqlServer.TblBlog>().CountAsync();
         }

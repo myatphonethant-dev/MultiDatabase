@@ -1,7 +1,4 @@
-﻿using MultiDatabase.Models.Common;
-using MultiDatabase.Repositories.Blog.BlogRepository;
-
-namespace MultiDatabase.Repositories.Blog.BlogService;
+﻿namespace MultiDatabase.Repositories.Blog.BlogService;
 
 public class BlogService : IBlogService
 {

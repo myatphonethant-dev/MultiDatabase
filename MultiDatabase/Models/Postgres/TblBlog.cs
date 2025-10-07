@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace MultiDatabase.Models.Postgres;
 
-namespace MultiDatabase.Models.Postgres;
-
-/// <summary>
-/// Stores blog posts and articles
-/// </summary>
 public partial class TblBlog
 {
     public int BlogId { get; set; }

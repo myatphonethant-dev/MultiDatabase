@@ -1,92 +1,87 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using MultiDatabase.Models.Postgres;
-using MultiDatabase.Models.SqlServer;
+﻿namespace MultiDatabase.AppDbContext;
 
-namespace MultiDatabase.AppDbContext
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum DatabaseType
 {
-    public enum DatabaseType
+    Mssql,
+    Postgres
+}
+
+public interface IDatabaseContextFactory
+{
+    DbContext CreateDbContext(string databaseName, DatabaseType databaseType = DatabaseType.Mssql);
+    Task<bool> TestConnectionAsync(string databaseName, DatabaseType databaseType = DatabaseType.Mssql);
+}
+
+public class DatabaseContextFactory : IDatabaseContextFactory
+{
+    private readonly string _sqlServerConnectionString;
+    private readonly string _postgresConnectionString;
+
+    public DatabaseContextFactory(IConfiguration configuration)
     {
-        SqlServer,
-        PostgreSQL
+        _sqlServerConnectionString = configuration.GetConnectionString("SqlServerConnection")!;
+        _postgresConnectionString = configuration.GetConnectionString("PostgresConnection")!;
     }
 
-    public interface IDatabaseContextFactory
+    public DbContext CreateDbContext(string databaseName, DatabaseType databaseType = DatabaseType.Mssql)
     {
-        DbContext CreateDbContext(string databaseName, DatabaseType databaseType = DatabaseType.SqlServer);
-        Task<bool> TestConnectionAsync(string databaseName, DatabaseType databaseType = DatabaseType.SqlServer);
+        switch (databaseType)
+        {
+            case DatabaseType.Mssql:
+                var sqlServerConn = GetSqlServerConnectionString(_sqlServerConnectionString, databaseName);
+                var sqlServerOptions = new DbContextOptionsBuilder<SqlServerDbContext>()
+                    .UseSqlServer(sqlServerConn)
+                    .Options;
+                return new SqlServerDbContext(sqlServerOptions);
+
+            case DatabaseType.Postgres:
+                var postgresConn = GetPostgresConnectionString(_postgresConnectionString, databaseName);
+                var postgresOptions = new DbContextOptionsBuilder<PostgresDbContext>()
+                    .UseNpgsql(postgresConn)
+                    .Options;
+                return new PostgresDbContext(postgresOptions);
+
+            default:
+                throw new ArgumentException($"Unsupported database type: {databaseType}");
+        }
     }
 
-    public class DatabaseContextFactory : IDatabaseContextFactory
+    public async Task<bool> TestConnectionAsync(string databaseName, DatabaseType databaseType = DatabaseType.Mssql)
     {
-        private readonly string _sqlServerConnectionString;
-        private readonly string _postgresConnectionString;
-
-        public DatabaseContextFactory(IConfiguration configuration)
+        try
         {
-            _sqlServerConnectionString = configuration.GetConnectionString("SqlServerConnection")!;
-            _postgresConnectionString = configuration.GetConnectionString("PostgresConnection")!;
+            using var context = CreateDbContext(databaseName, databaseType);
+            await context.Database.CanConnectAsync();
+            return true;
         }
-
-        public DbContext CreateDbContext(string databaseName, DatabaseType databaseType = DatabaseType.SqlServer)
+        catch
         {
-            switch (databaseType)
-            {
-                case DatabaseType.SqlServer:
-                    var sqlServerConn = GetSqlServerConnectionString(_sqlServerConnectionString, databaseName);
-                    var sqlServerOptions = new DbContextOptionsBuilder<SqlServerDbContext>()
-                        .UseSqlServer(sqlServerConn)
-                        .Options;
-                    return new SqlServerDbContext(sqlServerOptions);
-
-                case DatabaseType.PostgreSQL:
-                    var postgresConn = GetPostgresConnectionString(_postgresConnectionString, databaseName);
-                    var postgresOptions = new DbContextOptionsBuilder<PostgresDbContext>()
-                        .UseNpgsql(postgresConn)
-                        .Options;
-                    return new PostgresDbContext(postgresOptions);
-
-                default:
-                    throw new ArgumentException($"Unsupported database type: {databaseType}");
-            }
+            return false;
         }
+    }
 
-        public async Task<bool> TestConnectionAsync(string databaseName, DatabaseType databaseType = DatabaseType.SqlServer)
+    private static string GetSqlServerConnectionString(string connectionString, string databaseName)
+    {
+        if (string.IsNullOrEmpty(databaseName))
+            return connectionString;
+
+        var builder = new SqlConnectionStringBuilder(connectionString)
         {
-            try
-            {
-                using var context = CreateDbContext(databaseName, databaseType);
-                await context.Database.CanConnectAsync();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
+            InitialCatalog = databaseName
+        };
+        return builder.ConnectionString;
+    }
 
-        private static string GetSqlServerConnectionString(string connectionString, string databaseName)
+    private static string GetPostgresConnectionString(string connectionString, string databaseName)
+    {
+        if (string.IsNullOrEmpty(databaseName))
+            return connectionString;
+
+        var builder = new Npgsql.NpgsqlConnectionStringBuilder(connectionString)
         {
-            if (string.IsNullOrEmpty(databaseName))
-                return connectionString;
-
-            var builder = new SqlConnectionStringBuilder(connectionString)
-            {
-                InitialCatalog = databaseName
-            };
-            return builder.ConnectionString;
-        }
-
-        private static string GetPostgresConnectionString(string connectionString, string databaseName)
-        {
-            if (string.IsNullOrEmpty(databaseName))
-                return connectionString;
-
-            var builder = new Npgsql.NpgsqlConnectionStringBuilder(connectionString)
-            {
-                Database = databaseName
-            };
-            return builder.ConnectionString;
-        }
+            Database = databaseName
+        };
+        return builder.ConnectionString;
     }
 }

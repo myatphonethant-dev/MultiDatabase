@@ -1,18 +1,19 @@
-using MultiDatabase.AppDbContext;
-using MultiDatabase.Services;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IDatabaseContextFactory, DatabaseContextFactory>();
 builder.Services.AddScoped<IMultiDatabaseServiceFactory, MultiDatabaseServiceFactory>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

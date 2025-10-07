@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MultiDatabase.AppDbContext;
-using MultiDatabase.Models.Common;
-using MultiDatabase.Services;
-
-namespace MultiDatabase.Controllers;
+﻿namespace MultiDatabase.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -19,7 +14,7 @@ public class BlogController : ControllerBase
     }
 
     [HttpGet("{databaseType}")]
-    public async Task<ActionResult<IEnumerable<BlogModel>>> GetBlogs(DatabaseType databaseType)
+    public async Task<ActionResult<IEnumerable<BlogModel>>> GetBlogs([FromRoute] DatabaseType databaseType)
     {
         try
         {
@@ -35,7 +30,7 @@ public class BlogController : ControllerBase
     }
 
     [HttpGet("{databaseType}/{id}")]
-    public async Task<ActionResult<BlogModel>> GetBlog(DatabaseType databaseType, int id)
+    public async Task<ActionResult<BlogModel>> GetBlog([FromRoute] DatabaseType databaseType, int id)
     {
         try
         {
@@ -55,7 +50,7 @@ public class BlogController : ControllerBase
     }
 
     [HttpGet("{databaseType}/author/{author}")]
-    public async Task<ActionResult<IEnumerable<BlogModel>>> GetBlogsByAuthor(DatabaseType databaseType, string author)
+    public async Task<ActionResult<IEnumerable<BlogModel>>> GetBlogsByAuthor([FromRoute] DatabaseType databaseType, string author)
     {
         try
         {
@@ -71,7 +66,7 @@ public class BlogController : ControllerBase
     }
 
     [HttpGet("{databaseType}/search/{searchTerm}")]
-    public async Task<ActionResult<IEnumerable<BlogModel>>> SearchBlogs(DatabaseType databaseType, string searchTerm)
+    public async Task<ActionResult<IEnumerable<BlogModel>>> SearchBlogs([FromRoute] DatabaseType databaseType, string searchTerm)
     {
         try
         {
@@ -87,7 +82,7 @@ public class BlogController : ControllerBase
     }
 
     [HttpPost("{databaseType}")]
-    public async Task<ActionResult<BlogModel>> CreateBlog(DatabaseType databaseType, BlogModel blog)
+    public async Task<ActionResult<BlogModel>> CreateBlog([FromRoute] DatabaseType databaseType, BlogModel blog)
     {
         try
         {
@@ -107,7 +102,7 @@ public class BlogController : ControllerBase
     }
 
     [HttpPut("{databaseType}/{id}")]
-    public async Task<IActionResult> UpdateBlog(DatabaseType databaseType, int id, BlogModel blog)
+    public async Task<IActionResult> UpdateBlog([FromRoute] DatabaseType databaseType, int id, BlogModel blog)
     {
         try
         {
@@ -130,7 +125,7 @@ public class BlogController : ControllerBase
     }
 
     [HttpDelete("{databaseType}/{id}")]
-    public async Task<IActionResult> DeleteBlog(DatabaseType databaseType, int id)
+    public async Task<IActionResult> DeleteBlog([FromRoute] DatabaseType databaseType, int id)
     {
         try
         {
@@ -146,7 +141,7 @@ public class BlogController : ControllerBase
     }
 
     [HttpGet("{databaseType}/count")]
-    public async Task<ActionResult<int>> GetBlogCount(DatabaseType databaseType)
+    public async Task<ActionResult<int>> GetBlogCount([FromRoute] DatabaseType databaseType)
     {
         try
         {
@@ -162,7 +157,7 @@ public class BlogController : ControllerBase
     }
 
     [HttpGet("{databaseType}/exists/{id}")]
-    public async Task<ActionResult<bool>> BlogExists(DatabaseType databaseType, int id)
+    public async Task<ActionResult<bool>> BlogExists([FromRoute] DatabaseType databaseType, int id)
     {
         try
         {
