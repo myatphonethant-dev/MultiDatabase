@@ -1,4 +1,7 @@
-﻿namespace MultiDatabase.Models.SqlServer;
+﻿using System;
+using System.Collections.Generic;
+
+namespace MultiDatabase.Models.SqlServer;
 
 public partial class TblBlog
 {

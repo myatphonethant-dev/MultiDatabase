@@ -1,4 +1,7 @@
-﻿namespace MultiDatabase.Models.Postgres;
+﻿using System;
+using System.Collections.Generic;
+
+namespace MultiDatabase.Models.Postgres;
 
 public partial class TblBlog
 {
