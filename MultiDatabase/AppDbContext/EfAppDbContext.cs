@@ -47,7 +47,7 @@ public class DatabaseContextFactory : IDatabaseContextFactory
         }
     }
 
-    public async Task<bool> TestConnectionAsync(string databaseName, DatabaseType databaseType = DatabaseType.Mssql)
+    public async Task<bool> TestConnectionAsync(string databaseName, DatabaseType databaseType = DatabaseType.Postgres)
     {
         try
         {

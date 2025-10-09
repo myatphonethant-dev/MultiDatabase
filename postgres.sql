@@ -1,4 +1,4 @@
-create database testdb;
+use Test
 
 create table public.tbl_blog
 (

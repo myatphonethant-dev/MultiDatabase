@@ -16,7 +16,7 @@ public class MultiDatabaseServiceFactory : IMultiDatabaseServiceFactory
 
     public IBlogService CreateBlogService(DatabaseType databaseType)
     {
-        var context = _contextFactory.CreateDbContext("testdb", databaseType);
+        var context = _contextFactory.CreateDbContext("TestDb", databaseType);
         var blogRepository = new BlogRepository(context, databaseType);
         return new BlogService(blogRepository);
     }
