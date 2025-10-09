@@ -1,4 +1,8 @@
-﻿namespace MultiDatabase.Models.SqlServer;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+
+namespace MultiDatabase.Models.SqlServer;
 
 public partial class SqlServerDbContext : DbContext
 {
@@ -11,37 +15,26 @@ public partial class SqlServerDbContext : DbContext
     {
     }
 
-    public virtual DbSet<TblBlog> TblBlogs { get; set; } = null!;
+    public virtual DbSet<TblBlog> TblBlogs { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-            optionsBuilder.UseSqlServer("Server=localhost;Database=TestDb;User Id=sa;Password=sasa@123;TrustServerCertificate=true;");
-        }
-    }
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=localhost;Database=TestDb;User Id=sa;Password=sasa@123;TrustServerCertificate=true;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TblBlog>(entity =>
         {
-            entity.HasKey(e => e.BlogId)
-                .HasName("Tbl_Blog_pk");
+            entity.HasKey(e => e.BlogId).HasName("PK__Tbl_Blog__54379E3034AA11C7");
 
             entity.ToTable("Tbl_Blog");
 
-            entity.Property(e => e.BlogId).ValueGeneratedNever();
-
             entity.Property(e => e.BlogAuthor)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .IsUnicode(false);
-
-            entity.Property(e => e.BlogContent)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-
+            entity.Property(e => e.BlogContent).IsUnicode(false);
             entity.Property(e => e.BlogTitle)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .IsUnicode(false);
         });
 

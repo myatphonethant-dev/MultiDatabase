@@ -43,9 +43,14 @@ public class BlogService : IBlogService
         if (string.IsNullOrWhiteSpace(blog.BlogTitle))
             throw new ArgumentException("Blog title is required");
 
-        blog.BlogId = 0;
+        var newBlog = new BlogModel
+        {
+            BlogTitle = blog.BlogTitle,
+            BlogAuthor = blog.BlogAuthor,
+            BlogContent = blog.BlogContent,
+        };
 
-        return await _blogRepository.AddAsync(blog);
+        return await _blogRepository.AddAsync(newBlog);
     }
 
     public async Task<BlogModel> UpdateBlogAsync(BlogModel blog)
