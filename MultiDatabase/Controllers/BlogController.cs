@@ -4,13 +4,15 @@
 [ApiController]
 public class BlogController : ControllerBase
 {
-    private readonly IMultiDatabaseServiceFactory _serviceFactory;
+    // private readonly IMultiDatabaseServiceFactory _serviceFactory;
+    private readonly IBlogService _blogService;
     private readonly ILogger<BlogController> _logger;
 
-    public BlogController(IMultiDatabaseServiceFactory serviceFactory, ILogger<BlogController> logger)
+    public BlogController(ILogger<BlogController> logger,
+        IBlogService blogService)
     {
-        _serviceFactory = serviceFactory;
         _logger = logger;
+        _blogService = blogService;
     }
 
     [HttpGet("{databaseType}")]
@@ -18,8 +20,8 @@ public class BlogController : ControllerBase
     {
         try
         {
-            var service = _serviceFactory.CreateBlogService(databaseType);
-            var blogs = await service.GetAllBlogsAsync();
+            // var service = _blogService.CreateBlogService(databaseType);
+            var blogs = await _blogService.GetAllBlogsAsync();
             return Ok(blogs);
         }
         catch (Exception ex)
@@ -34,8 +36,8 @@ public class BlogController : ControllerBase
     {
         try
         {
-            var service = _serviceFactory.CreateBlogService(databaseType);
-            var blog = await service.GetBlogByIdAsync(id);
+            // var service = _serviceFactory.CreateBlogService(databaseType);
+            var blog = await _blogService.GetBlogByIdAsync(id);
 
             if (blog == null)
                 return NotFound($"Blog with ID {id} not found");
@@ -50,12 +52,13 @@ public class BlogController : ControllerBase
     }
 
     [HttpGet("{databaseType}/author/{author}")]
-    public async Task<ActionResult<IEnumerable<BlogModel>>> GetBlogsByAuthor([FromRoute] DatabaseType databaseType, string author)
+    public async Task<ActionResult<IEnumerable<BlogModel>>> GetBlogsByAuthor([FromRoute] DatabaseType databaseType,
+        string author)
     {
         try
         {
-            var service = _serviceFactory.CreateBlogService(databaseType);
-            var blogs = await service.GetBlogsByAuthorAsync(author);
+            // var service = _serviceFactory.CreateBlogService(databaseType);
+            var blogs = await _blogService.GetBlogsByAuthorAsync(author);
             return Ok(blogs);
         }
         catch (Exception ex)
@@ -66,17 +69,19 @@ public class BlogController : ControllerBase
     }
 
     [HttpGet("{databaseType}/search/{searchTerm}")]
-    public async Task<ActionResult<IEnumerable<BlogModel>>> SearchBlogs([FromRoute] DatabaseType databaseType, string searchTerm)
+    public async Task<ActionResult<IEnumerable<BlogModel>>> SearchBlogs([FromRoute] DatabaseType databaseType,
+        string searchTerm)
     {
         try
         {
-            var service = _serviceFactory.CreateBlogService(databaseType);
-            var blogs = await service.SearchBlogsAsync(searchTerm);
+            // var service = _serviceFactory.CreateBlogService(databaseType);
+            var blogs = await _blogService.SearchBlogsAsync(searchTerm);
             return Ok(blogs);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error searching blogs with term {SearchTerm} from {DatabaseType}", searchTerm, databaseType);
+            _logger.LogError(ex, "Error searching blogs with term {SearchTerm} from {DatabaseType}", searchTerm,
+                databaseType);
             return StatusCode(500, $"Error searching blogs: {ex.Message}");
         }
     }
@@ -86,8 +91,8 @@ public class BlogController : ControllerBase
     {
         try
         {
-            var service = _serviceFactory.CreateBlogService(databaseType);
-            var createdBlog = await service.CreateBlogAsync(blog);
+            // var service = _serviceFactory.CreateBlogService(databaseType);
+            var createdBlog = await _blogService.CreateBlogAsync(blog);
             return CreatedAtAction(nameof(GetBlog), new { databaseType, id = createdBlog.BlogId }, createdBlog);
         }
         catch (ArgumentException ex)
@@ -109,8 +114,8 @@ public class BlogController : ControllerBase
             if (id != blog.BlogId)
                 return BadRequest("Blog ID mismatch");
 
-            var service = _serviceFactory.CreateBlogService(databaseType);
-            await service.UpdateBlogAsync(blog);
+            // var service = _serviceFactory.CreateBlogService(databaseType);
+            await _blogService.UpdateBlogAsync(blog);
             return NoContent();
         }
         catch (KeyNotFoundException ex)
@@ -129,8 +134,8 @@ public class BlogController : ControllerBase
     {
         try
         {
-            var service = _serviceFactory.CreateBlogService(databaseType);
-            await service.DeleteBlogAsync(id);
+            // var service = _serviceFactory.CreateBlogService(databaseType);
+            await _blogService.DeleteBlogAsync(id);
             return NoContent();
         }
         catch (Exception ex)
@@ -145,8 +150,8 @@ public class BlogController : ControllerBase
     {
         try
         {
-            var service = _serviceFactory.CreateBlogService(databaseType);
-            var count = await service.GetBlogCountAsync();
+            // var service = _serviceFactory.CreateBlogService(databaseType);
+            var count = await _blogService.GetBlogCountAsync();
             return Ok(count);
         }
         catch (Exception ex)
@@ -161,8 +166,8 @@ public class BlogController : ControllerBase
     {
         try
         {
-            var service = _serviceFactory.CreateBlogService(databaseType);
-            var exists = await service.BlogExistsAsync(id);
+            // var service = _serviceFactory.CreateBlogService(databaseType);
+            var exists = await _blogService.BlogExistsAsync(id);
             return Ok(exists);
         }
         catch (Exception ex)

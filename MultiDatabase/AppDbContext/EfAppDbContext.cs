@@ -7,6 +7,41 @@ public enum DatabaseType
     Postgres
 }
 
+public interface IDbContextFactory
+{
+    DbContext CreateDbContext();
+}
+
+public class DbContextFactory : IDbContextFactory
+{
+    private readonly IConfiguration _configuration;
+    private readonly IServiceProvider _serviceProvider;
+
+    public DbContextFactory(IConfiguration configuration, IServiceProvider serviceProvider)
+    {
+        _configuration = configuration;
+        _serviceProvider = serviceProvider;
+    }
+
+    public DbContext CreateDbContext()
+    {
+        string databaseType = _configuration["DatabaseType"] ?? "Mssql";
+        var enumDbType = Enum.Parse<DatabaseType>(databaseType);
+
+        switch (enumDbType)
+        {
+            case DatabaseType.Mssql:
+                return _serviceProvider.GetRequiredService<SqlServerDbContext>();
+
+            case DatabaseType.Postgres:
+                return _serviceProvider.GetRequiredService<PostgresDbContext>();
+
+            default:
+                throw new ArgumentException($"Unsupported database type: {databaseType}");
+        }
+    }
+}
+
 public interface IDatabaseContextFactory
 {
     DbContext CreateDbContext(string databaseName, DatabaseType databaseType = DatabaseType.Mssql);

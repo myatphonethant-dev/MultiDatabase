@@ -2,13 +2,16 @@
 
 public class BlogRepository : IBlogRepository
 {
+    private readonly IDbContextFactory _dbContextFactory;
     private readonly DbContext _context;
     private readonly DatabaseType _databaseType;
 
-    public BlogRepository(DbContext context, DatabaseType databaseType)
+    public BlogRepository(DbContext context, DatabaseType databaseType, IDbContextFactory dbContextFactory)
     {
         _context = context;
         _databaseType = databaseType;
+        _dbContextFactory = dbContextFactory;
+        _context = _dbContextFactory.CreateDbContext();
     }
 
     public async Task<BlogModel> GetByIdAsync(int id)

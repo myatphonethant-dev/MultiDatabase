@@ -1,4 +1,4 @@
-﻿namespace MultiDatabase.Services;
+﻿/*namespace MultiDatabase.Services;
 
 public interface IMultiDatabaseServiceFactory
 {
@@ -20,4 +20,4 @@ public class MultiDatabaseServiceFactory : IMultiDatabaseServiceFactory
         var blogRepository = new BlogRepository(context, databaseType);
         return new BlogService(blogRepository);
     }
-}
+}*/
