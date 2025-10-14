@@ -45,6 +45,7 @@ public class BlogService : IBlogService
 
         var newBlog = new BlogModel
         {
+            BlogId = blog.BlogId,
             BlogTitle = blog.BlogTitle,
             BlogAuthor = blog.BlogAuthor,
             BlogContent = blog.BlogContent,

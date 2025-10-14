@@ -1,4 +1,4 @@
-﻿namespace MultiDatabase.Repositories;
+﻿namespace MultiDatabase.Repositories.Blog.BlogRepository;
 
 public class BlogRepository : IBlogRepository
 {
@@ -6,9 +6,9 @@ public class BlogRepository : IBlogRepository
     private readonly DbContext _context;
     private readonly DatabaseType _databaseType;
 
-    public BlogRepository(DbContext context, DatabaseType databaseType, IDbContextFactory dbContextFactory)
+    public BlogRepository(DatabaseType databaseType, 
+        IDbContextFactory dbContextFactory)
     {
-        _context = context;
         _databaseType = databaseType;
         _dbContextFactory = dbContextFactory;
         _context = _dbContextFactory.CreateDbContext();
